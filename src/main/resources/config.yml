@@ -1,0 +1,106 @@
+#
+# ==== General info ====
+# 
+# * You can add your own handlers in this file but don't forget to
+# add they into 'handlers' list
+#
+# * After editing of this file you need to check server logs to be
+# sure that no errors was appeared
+#
+
+#
+# Show debug info. Possible values: true | false (default = false)
+#
+# If debug info is 'true' you will get the following information in
+# server logs:
+#
+# > PLAYER (PROJECTILE): 2,00 > 2,00
+# ARROW > PLAYER (PROJECTILE): 2,00 > 2,00
+# Apply adaptive{$X=4.5, $MOB_KILLS=1, $DEATHS=2}
+# > PLAYER (ENTITY_ATTACK): 4,50 > 4,31
+# ZOMBIE > PLAYER (ENTITY_ATTACK): 4,31 > 4,31
+#
+debug: false
+
+#
+# List of handlers
+# - <handler1>
+#   ...
+# - <handlerN>
+#
+# All handlers will handle a damage in sequence in which they are
+# described in this option
+#
+
+handlers:
+  - adaptive
+  - creeper
+  
+#
+# ==== Handlers definition ====
+# Example:
+#
+# <handler>:
+#   sources: ### Possible entity types of damage source, see
+#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+#            ### By default a damage from all sources will be changed
+#     - <entity-type1>
+#       ...
+#     - <entity-typeN>
+#
+#   targets: ### Possible entity types of damage target, see
+#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+#            ### By default a damage from all targets will be changed
+#     - <entity-type1>
+#       ...
+#     - <entity-typeN>
+#
+#   causes:  ### Possible damage causes, see
+#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+#            ### By default a damage with any causes will be changed
+#     - <damage-cause1>
+#       ...
+#     - <damage-causeN>
+#
+#   formula: <expression> ### Formula of damage calculation,
+#                         ### see description below
+#
+# ==== Formula definition ====
+#
+# 1. You should use JavaScript syntax
+# 2. You can use JavaScript Math module functions, see
+#    http://www.w3schools.com/js/js_math.asp 
+# 3. Previous damage value will be passed via $X variable
+# 4. Additionally you can use Player statistics, but only if 'targets'
+#    equals to [PLAYER], see
+#    https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Statistic.html
+#    Type of statistics you be 'UNTYPED', see
+#    https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Statistic.Type.html
+#
+# Examples:
+#
+# 1. Set a damage to constant:
+# formula: 10
+#
+# 2. Double a damage:
+# formula: $X * 2
+#
+# 3. Increase a damage depending on count of killing mobs: 
+# formula: $X + $MOB_KILLS * 0.1
+#
+
+creeper:
+  sources: 
+    - CREEPER 
+  targets:
+    - PLAYER
+  causes:
+    - ENTITY_EXPLOSION
+  formula: $X * 1.5
+  
+adaptive:
+  targets:
+    - PLAYER
+  causes:
+    - ENTITY_ATTACK
+  formula: $X * Math.sqrt(($MOB_KILLS + 10) / ($DEATHS + 10))

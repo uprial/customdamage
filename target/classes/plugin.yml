@@ -1,0 +1,13 @@
+name: CustomDamage
+main: com.gmail.uprial.customdamage.CustomDamage
+version: 0.1.0
+commands:
+   customdamage:
+      description: Reload CustomDamage config
+      usage: /customdamage help
+      permission: 
+      permission-message: 
+permissions:
+    customdamage.reload:
+        description: Gives access to CustomDamage 'reload' command
+        default: op

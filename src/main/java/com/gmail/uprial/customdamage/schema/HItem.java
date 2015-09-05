@@ -1,5 +1,6 @@
 package com.gmail.uprial.customdamage.schema;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.Set;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.gmail.uprial.customdamage.ConfigReader;
@@ -27,14 +29,14 @@ public class HItem {
 	}
 	
     public double calculateDamageByEntity(double baseDamage, Entity source, Entity target, DamageCause cause) {
-    	if ((null != sources) && containsSource(source.getType()) && containsTarget(target.getType()) && containsCause(cause))
+    	if (containsSource(source.getType()) && containsTarget(target.getType()) && containsCause(cause))
     		return formula.calculateDamage(baseDamage, target);
     	else
     		return baseDamage;
     }
     
     public double calculateDamage(double baseDamage, Entity target, DamageCause cause) {
-    	if ((null == sources) && containsTarget(target.getType()) && containsCause(cause))
+    	if (containsTarget(target.getType()) && containsCause(cause))
     		return formula.calculateDamage(baseDamage, target);
     	else
     		return baseDamage;
@@ -84,6 +86,7 @@ public class HItem {
 		if (null == strings)
 			return null;
 		
+		List<EntityType> projectileEntityTypes = getProjectileEntityTypes();
 		Set<EntityType> entityTypes = new HashSet<EntityType>();
 		for(int i = 0; i < strings.size(); i++) {
 			String string = strings.get(i);
@@ -98,9 +101,13 @@ public class HItem {
 				customLogger.error(String.format("Entity type '%s' in %s '%s' is not unique", entityType.toString(), title, name, i));
 				continue;
 			}
+			if (projectileEntityTypes.contains(entityType)) {
+				customLogger.error(String.format("Entity type '%s' in %s '%s' should not be a projectile. Projectile entity types: %s",
+									entityType.toString(), title, name, projectileEntityTypes.toString()));
+				continue;
+			}
 			entityTypes.add(entityType);
 		}
-			
 		return entityTypes;
 	}
 	
@@ -129,4 +136,25 @@ public class HItem {
 		return damageCauses;
 	}
 	
+	private static List<EntityType> getProjectileEntityTypes() {
+		List<EntityType> projectileEntityTypes = new ArrayList<EntityType>(); 
+		for(EntityType item : EntityType.values()) {
+		    Class<? extends Entity> entityClass = item.getEntityClass();
+			if ((null != entityClass) && (Projectile.class.isAssignableFrom(entityClass)))
+				projectileEntityTypes.add(item);
+		}
+		
+		return projectileEntityTypes;
+	}
+	
+
+	private static <T> Set<T> getIntersection(Set<T> setA, Set<T> setB) {
+		Set<T> intersection = new HashSet<T>();
+		for (T item : setA)
+			if (setB.contains(item))
+				intersection.add(item);
+		
+		return intersection;
+	}	
+
 }

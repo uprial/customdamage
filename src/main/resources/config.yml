@@ -44,6 +44,9 @@ handlers:
 #   sources: ### Possible entity types of damage source, see
 #https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
 #            ### By default a damage from all sources will be changed
+#            ###
+#            ### Type of source should not be a projectile, see
+#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Projectile.html
 #     - <entity-type1>
 #       ...
 #     - <entity-typeN>
@@ -74,7 +77,7 @@ handlers:
 # 4. Additionally you can use Player statistics, but only if 'targets'
 #    equals to [PLAYER], see
 #    https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Statistic.html
-#    Type of statistics you be 'UNTYPED', see
+#    Type of statistics should be 'UNTYPED', see
 #    https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Statistic.Type.html
 #
 # Examples:
@@ -91,7 +94,7 @@ handlers:
 
 creeper:
   sources: 
-    - CREEPER 
+    - CREEPER
   targets:
     - PLAYER
   causes:
@@ -101,6 +104,4 @@ creeper:
 adaptive:
   targets:
     - PLAYER
-  causes:
-    - ENTITY_ATTACK
   formula: $X * Math.sqrt(($MOB_KILLS + 10) / ($DEATHS + 10))

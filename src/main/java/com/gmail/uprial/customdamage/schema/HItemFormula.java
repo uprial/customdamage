@@ -129,17 +129,8 @@ public class HItemFormula {
 					continue;
 				}
 				if (statistic.getType() != Statistic.Type.UNTYPED) {
-					String errorMessage;
-					if (forbinnedStatistics.containsKey(statistic.getType()))
-						errorMessage = forbinnedStatistics.get(statistic.getType());
-					else
-						errorMessage = statistic.getType().toString();
-					
-					List<Statistic> allowedStatistics = new ArrayList<Statistic>(); 
-					for(Statistic item : Statistic.values())
-						if (item.getType() == Statistic.Type.UNTYPED)
-							allowedStatistics.add(item);
-					
+					String errorMessage = getForbinnedStatisticsErrorMessage(statistic.getType());
+					List<Statistic> allowedStatistics = getAllowedStatistics(); 
 					customLogger.error(String.format("Forbidden statistic '%s' in formula of handler '%s': %s. Allowed statistics: %s",
 														varname, key, errorMessage, allowedStatistics.toString()));
 					error = true;
@@ -168,6 +159,25 @@ public class HItemFormula {
 	    }
 		
 		return formula;
+	}
+	
+	private static String getForbinnedStatisticsErrorMessage(Statistic.Type statisticType) {
+		String errorMessage;
+		if (forbinnedStatistics.containsKey(statisticType))
+			errorMessage = forbinnedStatistics.get(statisticType);
+		else
+			errorMessage = statisticType.toString();
+		
+		return errorMessage;
+	}
+
+	private static List<Statistic> getAllowedStatistics() {
+		List<Statistic> allowedStatistics = new ArrayList<Statistic>(); 
+		for(Statistic item : Statistic.values())
+			if (item.getType() == Statistic.Type.UNTYPED)
+				allowedStatistics.add(item);
+		
+		return allowedStatistics;
 	}
 
 }

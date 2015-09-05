@@ -8,22 +8,23 @@ import com.gmail.uprial.customdamage.common.CustomLogger;
 public final class CustomDamage extends JavaPlugin {
 	private DamageConfig damageConfig;
 	private CustomLogger customLogger;
+	private DamageListener damageListener;
 	
     @Override
     public void onEnable() {
     	saveDefaultConfig();
     	customLogger = new CustomLogger(getLogger());
     	damageConfig = new DamageConfig(getConfig(), customLogger);
+    	damageListener = new DamageListener(this, customLogger);
 
-    	getServer().getPluginManager().registerEvents(new DamageListener(this, customLogger), this);
+    	getServer().getPluginManager().registerEvents(damageListener, this);
     	getCommand("customdamage").setExecutor(new CustomDamageCommandExecutor(this, customLogger));
-
     	customLogger.info("Plugin enabled");
     }
     
     @Override
     public void onDisable() {
-    	HandlerList.unregisterAll(this);
+    	HandlerList.unregisterAll(damageListener);
     	customLogger.info("Plugin disabled");
     }
     

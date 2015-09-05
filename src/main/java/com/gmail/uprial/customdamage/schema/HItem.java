@@ -17,13 +17,18 @@ import com.gmail.uprial.customdamage.common.CustomLogger;
 public class HItem {
 
 	private Set<EntityType> sources;
+	private Set<EntityType> excluded_sources;
 	private Set<EntityType> targets;
+	private Set<EntityType> excluded_targets;
 	private Set<DamageCause> causes;
 	private HItemFormula formula;
 	
-	public HItem(Set<EntityType> sources, Set<EntityType> targets, Set<DamageCause> causes, HItemFormula formula) {
+	public HItem(Set<EntityType> sources, Set<EntityType> excluded_sources, Set<EntityType> targets, Set<EntityType> excluded_targets,
+					Set<DamageCause> causes, HItemFormula formula) {
 		this.sources = sources;
+		this.excluded_sources = excluded_sources;
 		this.targets = targets;
+		this.excluded_targets = excluded_targets;
 		this.causes = causes;
 		this.formula = formula;
 	}
@@ -44,11 +49,13 @@ public class HItem {
 	
     
     private boolean containsSource(EntityType source) {
-    	return (null == sources) || (sources.contains(source));
+    	return ((null == sources) || (sources.contains(source)))
+    			&& ((null == excluded_sources) || (! excluded_sources.contains(source)));
     }
     
     private boolean containsTarget(EntityType target) {
-    	return (null == targets) || (targets.contains(target));
+    	return ((null == targets) || (targets.contains(target)))
+    			&& ((null == excluded_targets) || (! excluded_targets.contains(target)));
     }
 
     private boolean containsCause(DamageCause cause) {
@@ -58,7 +65,9 @@ public class HItem {
 	public static HItem getFromConfig(FileConfiguration config, CustomLogger customLogger, String key) {
 		
 		Set<EntityType> sources = getEntityTypesFromConfig(config, customLogger, key + ".sources", "sources list of handler", key);
+		Set<EntityType> excluded_sources = getEntityTypesFromConfig(config, customLogger, key + ".excluded-sources", "excluded sources list of handler", key);
 		Set<EntityType> targets = getEntityTypesFromConfig(config, customLogger, key + ".targets", "targets list of handler", key);
+		Set<EntityType> excluded_targets = getEntityTypesFromConfig(config, customLogger, key + ".excluded-targets", "excluded targets list of handler", key);
 		Set<DamageCause> causes = getDamageCausesFromConfig(config, customLogger, key + ".causes", "damage causes list of handler", key);
 		
 		HItemFormula formula = HItemFormula.getFromConfig(config, customLogger, key);
@@ -77,8 +86,24 @@ public class HItem {
 				
 			}
 		}
+		if ((null != sources) && (null != excluded_sources)) {
+			Set<EntityType> sourcesIntersection = getIntersection(sources, excluded_sources);
+			if (sourcesIntersection.size() > 0) {
+				customLogger.error(String.format("Sources list and excluded sources list of handler '%s' have conflicting items: %s",
+						key, sourcesIntersection.toString()));
+				return null;
+			}
+		}
+		if ((null != targets) && (null != excluded_targets)) {
+			Set<EntityType> targetsIntersection = getIntersection(targets, excluded_targets);
+			if (targetsIntersection.size() > 0) {
+				customLogger.error(String.format("Targets list and excluded targets list of handler '%s' have conflicting items: %s",
+						key, targetsIntersection.toString()));
+				return null;
+			}
+		}
 					
-		return new HItem(sources, targets, causes, formula);
+		return new HItem(sources, excluded_sources, targets, excluded_targets, causes, formula);
 	}
 
 	private static Set<EntityType> getEntityTypesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title, String name) {

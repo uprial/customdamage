@@ -51,12 +51,22 @@ handlers:
 #       ...
 #     - <entity-typeN>
 #
+#   excluded-sources: ### Excluded entity types of damage source
+#     - <excluded-entity-type1>
+#       ...
+#     - <excluded-entity-typeN>
+#
 #   targets: ### Possible entity types of damage target, see
 #https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
 #            ### By default a damage from all targets will be changed
 #     - <entity-type1>
 #       ...
 #     - <entity-typeN>
+#
+#   excluded-targets: ### Excluded entity types of damage target
+#     - <excluded-entity-type1>
+#       ...
+#     - <excluded-entity-typeN>
 #
 #   causes:  ### Possible damage causes, see
 #https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
@@ -102,6 +112,8 @@ creeper:
   formula: $X * 1.5
   
 adaptive:
+  excluded-sources:
+    - PLAYER
   targets:
     - PLAYER
   formula: $X * Math.sqrt(($MOB_KILLS + 10) / ($DEATHS + 10))

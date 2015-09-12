@@ -21,10 +21,10 @@ import com.gmail.uprial.customdamage.common.CustomLogger;
 
 public class HItemFormula {
 
-	private CustomLogger customLogger;
-	private String name;
-	private String expression;
-	private HashMap<String,Statistic> statistics;
+	private final CustomLogger customLogger;
+	private final String handlerName;
+	private final String expression;
+	private final HashMap<String,Statistic> statistics;
 	
 	private static final HashMap<Statistic.Type,String> forbinnedStatistics = new HashMap<Statistic.Type,String>() {
 		private static final long serialVersionUID = 1L;
@@ -34,9 +34,9 @@ public class HItemFormula {
 		put(Statistic.Type.ITEM, "Statistics of this type require an Item Material qualifier");
 	}};
 	
-	public HItemFormula(CustomLogger customLogger, String name, String expression, HashMap<String,Statistic> statistics) {
+	public HItemFormula(CustomLogger customLogger, String handlerName, String expression, HashMap<String,Statistic> statistics) {
 		this.customLogger = customLogger;
-		this.name = name;
+		this.handlerName = handlerName;
 		this.expression = expression;
 		
 		if (statistics.size() > 0)
@@ -45,8 +45,8 @@ public class HItemFormula {
 			this.statistics = null;
 	}
 	
-    public double calculateDamage(double baseDamage, Entity target) {
-    	LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>(); 
+    public double calculateDamage(double baseDamage, Entity statisticsSource) {
+	    ScriptEngine jsEngine = getEngine();
 	    
 	    Player player;
 		jsEngine.put("$X", baseDamage);

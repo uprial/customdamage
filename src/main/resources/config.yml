@@ -35,7 +35,9 @@ debug: false
 handlers:
   - adaptive
   - creeper
-  
+  - long-term-fine
+  - long-term-bonus
+    
 #
 # ==== Handlers definition ====
 # Example:
@@ -69,14 +71,27 @@ handlers:
 #     - <excluded-entity-typeN>
 #
 #   causes:  ### Possible damage causes, see
-#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+#https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event
+#        /entity/EntityDamageEvent.DamageCause.html
 #            ### By default a damage with any causes will be changed
 #     - <damage-cause1>
 #       ...
 #     - <damage-causeN>
 #
-#   formula: <expression> ### Formula of damage calculation,
+#   excluded-causes:  ### Excluded damage causes, see
+#     - <excluded-damage-cause1>
+#       ...
+#     - <excluded-damage-causeN>
+#
+#   formula: <expression> ### Formula of target damage modifiers calculation,
 #                         ### see description below
+#
+#   use-source-statistics: true | false ### Use statistics of damage source
+#                                       ### instead of damage target
+#                                       ### Default value is 'false'
+#
+#   user-info: ### Format of user-visible information about damage modifiers
+#              ### Should have one token to handle float value of multiplier
 #
 # ==== Formula definition ====
 #
@@ -116,4 +131,20 @@ adaptive:
     - PLAYER
   targets:
     - PLAYER
-  formula: $X * Math.sqrt(($MOB_KILLS + 10) / ($DEATHS + 10))
+  formula: $X * Math.max(1, Math.sqrt(($MOB_KILLS + 100) / ($DEATHS * 2 + 100)))
+  user-info: "Adaptive damage: %.3f"
+  
+long-term-fine:
+  excluded-sources:
+    - PLAYER
+  targets:
+    - PLAYER
+  formula: $X * Math.sqrt((200 + $DEATHS) / 200) 
+  user-info: "Long term fine:  %.3f"
+  
+long-term-bonus:
+  sources:
+    - PLAYER
+  formula: $X * Math.sqrt((1000 + $MOB_KILLS) / 1000)
+  use-source-statistics: true
+  user-info: "Long term bonus: %.3f"

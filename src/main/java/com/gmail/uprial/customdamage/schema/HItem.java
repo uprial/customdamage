@@ -16,50 +16,66 @@ import com.gmail.uprial.customdamage.common.CustomLogger;
 
 public class HItem {
 
-	private Set<EntityType> sources;
-	private Set<EntityType> excluded_sources;
-	private Set<EntityType> targets;
-	private Set<EntityType> excluded_targets;
-	private Set<DamageCause> causes;
-	private HItemFormula formula;
+	private final Set<EntityType> sources;
+	private final Set<EntityType> excluded_sources;
+	private final Set<EntityType> targets;
+	private final Set<EntityType> excluded_targets;
+	private final Set<DamageCause> causes;
+	private final Set<DamageCause> excluded_causes;
+	private final String user_info;
+	private final boolean useSourceStatistics;
+	private final HItemFormula formula;
 	
 	public HItem(Set<EntityType> sources, Set<EntityType> excluded_sources, Set<EntityType> targets, Set<EntityType> excluded_targets,
-					Set<DamageCause> causes, HItemFormula formula) {
+					Set<DamageCause> causes, Set<DamageCause> excluded_causes, String user_info,
+					boolean useSourceStatistics, HItemFormula formula) {
 		this.sources = sources;
 		this.excluded_sources = excluded_sources;
 		this.targets = targets;
 		this.excluded_targets = excluded_targets;
 		this.causes = causes;
+		this.excluded_causes = excluded_causes;
+		this.user_info = user_info;
+		this.useSourceStatistics = useSourceStatistics;
 		this.formula = formula;
 	}
 	
     public double calculateDamageByEntity(double baseDamage, Entity source, Entity target, DamageCause cause) {
-    	if (containsSource(source.getType()) && containsTarget(target.getType()) && containsCause(cause))
-    		return formula.calculateDamage(baseDamage, target);
-    	else
+    	if (containsSource(source.getType()) && containsTarget(target.getType()) && containsCause(cause)) {
+    		if (useSourceStatistics)
+        		return formula.calculateDamage(baseDamage, source);
+    		else
+    			return formula.calculateDamage(baseDamage, target);
+    	} else
     		return baseDamage;
     }
     
     public double calculateDamage(double baseDamage, Entity target, DamageCause cause) {
-    	if (containsTarget(target.getType()) && containsCause(cause))
+    	if (containsSource(EntityType.UNKNOWN) && containsTarget(target.getType()) && containsCause(cause))
     		return formula.calculateDamage(baseDamage, target);
     	else
     		return baseDamage;
     }
 	
+    public boolean isUserVisible() {
+    	return (null != user_info);
+    }
     
     private boolean containsSource(EntityType source) {
-    	return ((null == sources) || (sources.contains(source)))
-    			&& ((null == excluded_sources) || (! excluded_sources.contains(source)));
+    	return containsItem(sources, excluded_sources, source);
     }
     
     private boolean containsTarget(EntityType target) {
-    	return ((null == targets) || (targets.contains(target)))
-    			&& ((null == excluded_targets) || (! excluded_targets.contains(target)));
+    	return containsItem(targets, excluded_targets, target);
     }
 
     private boolean containsCause(DamageCause cause) {
-    	return (null == causes) || (causes.contains(cause));
+    	return containsItem(causes, excluded_causes, cause);
+    }
+    
+    private <T> boolean containsItem(Set<T> set, Set<T> excluded_set, T item) {
+    	return ((null == set) || (set.contains(item)))
+    			&& ((null == excluded_set) || (! excluded_set.contains(item)));
     }
 
 	public static HItem getFromConfig(FileConfiguration config, CustomLogger customLogger, String key) {
@@ -69,41 +85,60 @@ public class HItem {
 		Set<EntityType> targets = getEntityTypesFromConfig(config, customLogger, key + ".targets", "targets list of handler", key);
 		Set<EntityType> excluded_targets = getEntityTypesFromConfig(config, customLogger, key + ".excluded-targets", "excluded targets list of handler", key);
 		Set<DamageCause> causes = getDamageCausesFromConfig(config, customLogger, key + ".causes", "damage causes list of handler", key);
+		Set<DamageCause> excluded_causes = getDamageCausesFromConfig(config, customLogger, key + ".excluded-causes", "excluded damage causes list of handler", key);
 		
-		HItemFormula formula = HItemFormula.getFromConfig(config, customLogger, key);
+		if (hasIntersection(customLogger, key, "Sources list and excluded sources list", sources, excluded_sources))
+			return null;
+		if (hasIntersection(customLogger, key, "Targets list and excluded targets list", targets, excluded_targets))
+			return null;
+		if (hasIntersection(customLogger, key, "Causes list and excluded causes list", causes, excluded_causes))
+			return null;
+
+		boolean useSourceStatistics = ConfigReader.getBoolean(config, customLogger, key + ".use-source-statistics", "use-source-statistics flag of handler", key, false);
+		
+		HItemFormula formula = HItemFormula.getFromConfig(config, customLogger, key + ".formula", key);
 		if (null == formula)
 			return null;
 		
 		if (formula.hasStatictics()) {
-			if ((null == targets) || (! targets.contains(EntityType.PLAYER))) {
-				customLogger.error(String.format("Formula of handler '%s' uses a player statistics but handler source does not contain '%s'",
-													key, EntityType.PLAYER.toString()));
+			Set<EntityType> items;
+			String itemsTitle;
+			if (useSourceStatistics) {
+				items = sources;
+				itemsTitle = "sources";
+			}
+			else {
+				items = targets;
+				itemsTitle = "targets";
+			}
+			
+			if ((null == items) || (! items.contains(EntityType.PLAYER))) {
+				customLogger.error(String.format("Formula of handler '%s' uses a player statistics but handler '%s' do not contain '%s'",
+						key, itemsTitle, EntityType.PLAYER.toString()));
 				return null;
-			} else if (targets.size() > 1) {
-				customLogger.error(String.format("Formula of handler '%s' uses a player statictics but handler source contains not only '%s'",
-													key, EntityType.PLAYER.toString()));
+			} else if (items.size() > 1) {
+				customLogger.error(String.format("Formula of handler '%s' uses a player statictics but handler '%s' contain not only '%s'",
+						key, itemsTitle, EntityType.PLAYER.toString()));
 				return null;
 				
 			}
 		}
-		if ((null != sources) && (null != excluded_sources)) {
-			Set<EntityType> sourcesIntersection = getIntersection(sources, excluded_sources);
-			if (sourcesIntersection.size() > 0) {
-				customLogger.error(String.format("Sources list and excluded sources list of handler '%s' have conflicting items: %s",
-						key, sourcesIntersection.toString()));
-				return null;
-			}
-		}
-		if ((null != targets) && (null != excluded_targets)) {
-			Set<EntityType> targetsIntersection = getIntersection(targets, excluded_targets);
-			if (targetsIntersection.size() > 0) {
-				customLogger.error(String.format("Targets list and excluded targets list of handler '%s' have conflicting items: %s",
-						key, targetsIntersection.toString()));
-				return null;
-			}
-		}
+
+		String user_info = ConfigReader.getString(config, customLogger, key + ".user-info", "user-info string of handler", key);
 					
-		return new HItem(sources, excluded_sources, targets, excluded_targets, causes, formula);
+		return new HItem(sources, excluded_sources, targets, excluded_targets, causes, excluded_causes, user_info, useSourceStatistics, formula);
+	}
+
+	private static <T> boolean hasIntersection(CustomLogger customLogger, String key, String title, Set<T> setA, Set<T> setB) {
+		if ((null != setA) && (null != setB)) {
+			Set<T> intersection = getIntersection(setA, setB);
+			if (intersection.size() > 0) {
+				customLogger.error(String.format("%s of handler '%s' have conflicting items: %s", title, key, intersection.toString()));
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	private static Set<EntityType> getEntityTypesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title, String name) {
@@ -172,7 +207,6 @@ public class HItem {
 		return projectileEntityTypes;
 	}
 	
-
 	private static <T> Set<T> getIntersection(Set<T> setA, Set<T> setB) {
 		Set<T> intersection = new HashSet<T>();
 		for (T item : setA)

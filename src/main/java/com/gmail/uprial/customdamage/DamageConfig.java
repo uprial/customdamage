@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
@@ -14,6 +15,7 @@ import com.gmail.uprial.customdamage.schema.HItem;
 
 public class DamageConfig {
 
+	private final String EMPTY_INFO = "[INFORMATION IS NOT AVAILABLE]";
 	private Map<String,Integer> keys;
 	private List<HItem> handlers;
 	
@@ -33,6 +35,18 @@ public class DamageConfig {
     		baseDamage = handler.calculateDamage(baseDamage, target, cause);
     	}
     	return baseDamage;
+    }
+    
+    public String getPlayerInfo(Player player) {
+    	String info = "";
+    	for (HItem handler : handlers) {
+    		if (handler.isUserVisible())
+    			info += handler.getPlayerInfo(player) + "\n";
+    	}
+    	if (info.length() <= 0)
+    		info = EMPTY_INFO;
+    	
+    	return info;
     }
 
     private void readConfig(FileConfiguration config, CustomLogger customLogger) {

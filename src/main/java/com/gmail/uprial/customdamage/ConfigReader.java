@@ -40,5 +40,15 @@ public class ConfigReader {
 
 		return value;
 	}
-
+	
+	public static String getString(FileConfiguration config, CustomLogger customLogger, String key, String title, String name) {
+		String string = config.getString(key);
+		
+		if(null == string) {
+			customLogger.debug(String.format("Null/Empty %s '%s'", title, name));
+			return null;
+		}
+		
+		return string;
+	}
 }

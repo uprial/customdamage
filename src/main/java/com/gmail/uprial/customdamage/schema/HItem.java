@@ -8,6 +8,7 @@ import java.util.Set;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -61,6 +62,10 @@ public class HItem {
     	return (null != user_info);
     }
     
+    public String getPlayerInfo(Player player) {
+    	return String.format(user_info, formula.calculateDamage(1, player));
+    }
+
     private boolean containsSource(EntityType source) {
     	return containsItem(sources, excluded_sources, source);
     }

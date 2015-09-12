@@ -1,5 +1,8 @@
 package com.gmail.uprial.customdamage;
 
+import java.util.Collection;
+
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,4 +39,14 @@ public final class CustomDamage extends JavaPlugin {
 		reloadConfig();
 		damageConfig = new DamageConfig(getConfig(), customLogger);
     }
+    
+    public Player getPlayerByName(String playerName) {
+    	Collection<? extends Player> onlinePlayers = getServer().getOnlinePlayers();
+    	for (Player player : onlinePlayers)
+			if(player.getName().equalsIgnoreCase(playerName))
+				return player;
+		
+		return null;
+    }
+    
 }

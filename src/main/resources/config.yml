@@ -14,11 +14,14 @@
 # If debug info is 'true' you will get the following information in
 # server logs:
 #
-# > PLAYER (PROJECTILE): 2,00 > 2,00
-# ARROW > PLAYER (PROJECTILE): 2,00 > 2,00
-# Apply adaptive{$X=4.5, $MOB_KILLS=1, $DEATHS=2}
-# > PLAYER (ENTITY_ATTACK): 4,50 > 4,31
-# ZOMBIE > PLAYER (ENTITY_ATTACK): 4,31 > 4,31
+# Apply adaptive{$X=7.5, $MOB_KILLS=234, $DEATHS=20}
+# Apply creeper{$X=21.39}
+# CREEPER > PLAYER:Devil (ENTITY_EXPLOSION): 7.50 > 32.08
+#
+# Apply adaptive{$X=2.0, $MOB_KILLS=238, $DEATHS=25}
+# ? > PLAYER:Devil (FALL): 2.00 > 5.32
+#
+# This option can affect the performance
 #
 debug: false
 

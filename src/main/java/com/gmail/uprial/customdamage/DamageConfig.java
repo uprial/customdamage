@@ -41,7 +41,7 @@ public class DamageConfig {
 		keys = new HashMap<String,Integer>();
 		
 		boolean debug = ConfigReader.getBoolean(config, customLogger, "debug", "value flag", "debug", false);
-		customLogger.setDebug(debug);
+		customLogger.setDebugMode(debug);
 		
 		List<?> handlersConfig = config.getList("handlers");
 		if((null == handlersConfig) || (handlersConfig.size() <= 0)) {

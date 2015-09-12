@@ -33,37 +33,42 @@ public class DamageListener implements Listener {
 		Double baseDamage = event.getDamage();
 		
 		Double calculatedDamage;
-		String stringSource;
+		Entity damageSource;
 		if (event instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent)event;
-			Entity source = getRealSource(byEntityEvent.getDamager());
+			damageSource = getRealSource(byEntityEvent.getDamager());
 
-			if (null != source) {
-				calculatedDamage = plugin.getDamageConfig().calculateDamageByEntity(baseDamage, source, target, cause);
-				stringSource = getEntityName(source);
+			if (null != damageSource) {
+				calculatedDamage = plugin.getDamageConfig().calculateDamageByEntity(baseDamage, damageSource, target, cause);
 			} else {
 				calculatedDamage = plugin.getDamageConfig().calculateDamage(baseDamage, target, cause);
-				stringSource = UNKNOWN_SOURCE;
 			}
-		} else if (event instanceof EntityDamageByBlockEvent) {
-			calculatedDamage = plugin.getDamageConfig().calculateDamage(baseDamage, target, cause);
-			
-			EntityDamageByBlockEvent byBlockEvent = (EntityDamageByBlockEvent)event;
-			Block source = byBlockEvent.getDamager();
-			if (null != source)
-				stringSource = source.getType().toString();
-			else
-				stringSource = UNKNOWN_SOURCE;
 		} else {
+			damageSource = null;
 			calculatedDamage = plugin.getDamageConfig().calculateDamage(baseDamage, target, cause);
-			stringSource = UNKNOWN_SOURCE;
 		}
 		
 		event.setDamage(calculatedDamage);
 		
-		customLogger.debug(String.format("%s > %s (%s): %.2f > %.2f",
-											stringSource, getEntityName(target), cause.toString(),
-											baseDamage, calculatedDamage));
+		if (customLogger.isDebugMode()) {
+			String stringSource;
+			if (null != damageSource)
+				stringSource = getEntityName(damageSource);
+			else {
+				if (event instanceof EntityDamageByBlockEvent) {
+					EntityDamageByBlockEvent byBlockEvent = (EntityDamageByBlockEvent)event;
+					Block source = byBlockEvent.getDamager();
+					if (null != source)
+						stringSource = source.getType().toString();
+					else
+						stringSource = UNKNOWN_SOURCE;
+				} else
+					stringSource = UNKNOWN_SOURCE;
+			}
+			
+			customLogger.debug(String.format("%s > %s (%s): %.2f > %.2f",
+				stringSource, getEntityName(target), cause.toString(), baseDamage, calculatedDamage));
+		}
 	}
 	
 	private String getEntityName(Entity entity) {

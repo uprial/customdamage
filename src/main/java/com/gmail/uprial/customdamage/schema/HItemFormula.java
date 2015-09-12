@@ -48,31 +48,40 @@ public class HItemFormula {
     public double calculateDamage(double baseDamage, Entity target) {
     	LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>(); 
 	    
-	    params.put("$X", baseDamage);
+	    Player player;
+		jsEngine.put("$X", baseDamage);
 	    
 	    if (null != statistics) {
-	    	if  (!(target instanceof Player)) {
-				customLogger.error(String.format("Formula of handler '%s' expected a Player instead of %s", name, target.getType().toString()));
+	    	if  (!(statisticsSource instanceof Player)) {
+				customLogger.error(String.format("Formula of handler '%s' expected a Player instead of %s",
+						handlerName, statisticsSource.getType().toString()));
 				return baseDamage;
 	    	}
-	    	Player player = (Player)target;
+	    	player = (Player)statisticsSource;
 	    	for (HashMap.Entry<String, Statistic> entry : statistics.entrySet())
-				params.put("$" + entry.getKey(), player.getStatistic(entry.getValue()));
-	    }
+	    		jsEngine.put("$" + entry.getKey(), player.getStatistic(entry.getValue()));
+	    } else
+	    	player = null;
 	    
-	    ScriptEngine jsEngine = getEngine();
-    	for (HashMap.Entry<String, Object> entry : params.entrySet())
-    		jsEngine.put(entry.getKey(), entry.getValue());
-
-	    customLogger.debug(String.format("Apply %s%s", name, params.toString()));
+	    if (customLogger.isDebugMode()) {
+	    	LinkedHashMap<String, Object> params = new LinkedHashMap<String, Object>();
+		    params.put("baseDamage", String.format("%.2f", baseDamage));
+		    
+		    if (null != player) {
+		    	for (HashMap.Entry<String, Statistic> entry : statistics.entrySet())
+					params.put(entry.getKey(), player.getStatistic(entry.getValue()));
+		    }
+	    	
+	    	customLogger.debug(String.format("Apply %s%s", handlerName, params.toString()));
+	    }
 	    
    		try {
 			return Float.parseFloat(jsEngine.eval(expression).toString());
 		} catch (NumberFormatException ex) {
-			customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", name, ex.getMessage()));
+			customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", handlerName, ex.getMessage()));
 			return baseDamage;
 		} catch (ScriptException ex) {
-			customLogger.error(String.format("Formula of handler '%s' can not be converted to a float: %s", name, ex.getMessage()));
+			customLogger.error(String.format("Formula of handler '%s' can not be converted to a float: %s", handlerName, ex.getMessage()));
 			return baseDamage;
 		}
     }
@@ -101,11 +110,11 @@ public class HItemFormula {
 	}
 	
 	
-	public static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key) {
-		String expression = config.getString(key + ".formula");
+	public static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) {
+		String expression = config.getString(key);
 		
 		if(null == expression) {
-			customLogger.error(String.format("Null/Empty formula of handler '%s'", key));
+			customLogger.error(String.format("Null/Empty formula of handler '%s'", handlerName));
 			return null;
 		}
 
@@ -124,7 +133,7 @@ public class HItemFormula {
 				try {
 					statistic = Statistic.valueOf(varname);
 				} catch (java.lang.IllegalArgumentException e) {
-					customLogger.error(String.format("Invalid statistic '%s' in formula of handler '%s'", varname, key));
+					customLogger.error(String.format("Invalid statistic '%s' in formula of handler '%s'", varname, handlerName));
 					error = true;
 					continue;
 				}
@@ -132,7 +141,7 @@ public class HItemFormula {
 					String errorMessage = getForbinnedStatisticsErrorMessage(statistic.getType());
 					List<Statistic> allowedStatistics = getAllowedStatistics(); 
 					customLogger.error(String.format("Forbidden statistic '%s' in formula of handler '%s': %s. Allowed statistics: %s",
-														varname, key, errorMessage, allowedStatistics.toString()));
+														varname, handlerName, errorMessage, allowedStatistics.toString()));
 					error = true;
 					continue;
 				}
@@ -141,20 +150,16 @@ public class HItemFormula {
 			}
 		}
 		if (!x_found) {
-			customLogger.warning(String.format("Formula of handler '%s' does no contain $X variable", key));
+			customLogger.warning(String.format("Formula of handler '%s' does no contain $X variable", handlerName));
 		}
 		if (error)
 			return null;
 		
-		if (statistics.size() > 0) {
-			
-		}
-		 
-		HItemFormula formula = new HItemFormula(customLogger, key, expression, statistics);
+		HItemFormula formula = new HItemFormula(customLogger, handlerName, expression, statistics);
 		try {
 			formula.test();
 	    } catch (ScriptException ex) {
-			customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", key, ex.getMessage()));
+			customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", handlerName, ex.getMessage()));
 			return null;
 	    }
 		

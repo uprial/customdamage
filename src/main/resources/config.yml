@@ -15,11 +15,11 @@
 # server logs:
 #
 # Apply adaptive{$X=7.5, $MOB_KILLS=234, $DEATHS=20}
-# Apply creeper{$X=21.39}
-# CREEPER > PLAYER:Devil (ENTITY_EXPLOSION): 7.50 > 32.08
+# Apply creeper{$X=11.55}
+# CREEPER > PLAYER:Devil (ENTITY_EXPLOSION): 7.50 > 17.33
 #
 # Apply adaptive{$X=2.0, $MOB_KILLS=238, $DEATHS=25}
-# ? > PLAYER:Devil (FALL): 2.00 > 5.32
+# ? > PLAYER:Devil (FALL): 2.00 > 3.0
 #
 # This option can affect the performance
 #
@@ -120,6 +120,7 @@ handlers:
 # formula: $X + $MOB_KILLS * 0.1
 #
 
+# Powerful creeper
 creeper:
   sources: 
     - CREEPER
@@ -129,6 +130,18 @@ creeper:
     - ENTITY_EXPLOSION
   formula: $X * 1.5
 
+#
+# $MOB_KILLS, $DEATHS > Damage bonus
+# 10,         10      > 0
+# 10,         100     > 0
+# 10,         1000    > 0
+# 100,        10      > +29%
+# 100,        100     > 0
+# 100,        1000    > 0
+# 1000,       10      > +203%
+# 1000,       100     > +92%
+# 1000,       1000    > 0
+#
 adaptive:
   excluded-sources:
     - PLAYER
@@ -137,17 +150,33 @@ adaptive:
   formula: $X * Math.max(1, Math.sqrt(($MOB_KILLS + 100) / ($DEATHS * 2 + 100)))
   user-info: "Adaptive damage: %.3f"
 
+#
+# $DEATHS > Damage bonus
+#
+# 10      > +2.2%
+# 100     > +20%
+# 1000    > +133%
+# 10000   > +571%
+#
 long-term-fine:
   excluded-sources:
     - PLAYER
   targets:
     - PLAYER
-  formula: $X * Math.sqrt((200 + $DEATHS) / 200)
+  formula: $X * Math.sqrt((227 + $DEATHS) / 227)
   user-info: "Long term fine:  %.3f"
 
+#
+# $MOB_KILLS > Damage bonus
+#
+# 10         > 0.6%
+# 100        > 6%
+# 1000       > 50%
+# 10000      > 267%
+#
 long-term-bonus:
   sources:
     - PLAYER
-  formula: $X * Math.sqrt((500 + $MOB_KILLS) / 500)
+  formula: $X * Math.sqrt((800 + $MOB_KILLS) / 800)
   use-source-statistics: true
   user-info: "Long term bonus: %.3f"

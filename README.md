@@ -4,11 +4,11 @@ Tested on Spigot-1.10.2
 
 ## Introduction
 
-This is fully customizable plugin that allows You to control a damage taken by entity.
+This is fully customizable plugin that allows you to control a damage taken by entities.
 
 #### You can configure:
 * Filter of damage sources, targets and causes
-* Formula how to calculate a damage
+* A formula of how to calculate a damage
 * Dependencies from a player statistics
 
 #### You can solve the following problems:

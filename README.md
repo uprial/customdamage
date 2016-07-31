@@ -21,14 +21,14 @@ difficult for experienced players and easy for newbies without mechanics changes
 
 `customdamage reload`        - reload config from disk
 `customdamage info`          - show damage modifiers
-`customdamage info <player>` - show damage modifiers of \<player\>
+`customdamage info <player>` - show damage modifiers of <player\>
 
 ## Permissions
 
 * Access to 'reload' command:
 `customdamage.reload` (default: op)
 
-* Access to 'info \<player\>' command:
+* Access to 'info <player\>' command:
 `customdamage.info` (default: op)
 
 ## Configuration

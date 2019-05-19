@@ -19,9 +19,9 @@ difficult for experienced players and easy for newbies without mechanics changes
  
 ## Commands
 
-`customdamage reload`        - reload config from disk
-`customdamage info`          - show damage modifiers
-`customdamage info <player>` - show damage modifiers of <player\>
+* `customdamage reload`        - reload config from disk
+* `customdamage info`          - show damage modifiers
+* `customdamage info @player`  - show damage modifiers of @player;
 
 ## Permissions
 

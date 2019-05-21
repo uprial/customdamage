@@ -6,6 +6,13 @@ Tested on Spigot-1.8.8, Spigot-1.10.2 and Spigot-1.14.1.
 
 This is fully customizable plugin that allows you to control a damage taken by entities.
 
+## Features
+
+* Creeper does more damage by an explosion.
+* The more a player dies, the more damage he/she will receive in the long-term.
+* The more a player kills monsters, the more damage he/she will make in the long-term.
+* There is also a short-term increase of incoming damage based on a rate of monster kills to death to cut the player domination.
+
 #### You can configure:
 * Filter of damage sources, targets and causes
 * A formula of how to calculate a damage

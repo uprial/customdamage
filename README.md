@@ -23,7 +23,7 @@ This is fully customizable plugin that allows you to control a damage taken by e
 dangerous naturally
 * Change a damage depending on a players' kills or deaths, thus make a game more
 difficult for experienced players and easy for newbies without mechanics changes
- 
+
 ## Commands
 
 * `customdamage reload`        - reload config from disk

@@ -132,51 +132,69 @@ creeper:
 
 #
 # $MOB_KILLS, $DEATHS > Damage bonus
-# 10,         10      > 0
-# 10,         100     > 0
-# 10,         1000    > 0
-# 100,        10      > +29%
-# 100,        100     > 0
-# 100,        1000    > 0
-# 1000,       10      > +203%
-# 1000,       100     > +92%
-# 1000,       1000    > 0
+# 10,         10      > -5.8%
+# 10,         100     > -21%
+# 10,         1000    > -37%
+# 10,         10000   > -49%
+# 10,         100000  > -60%
+# 100,        10      > 0
+# 100,        100     > -16%
+# 100,        1000    > -32%
+# 100,        10000   > -46%
+# 100,        100000  > -57%
+# 1000,       10      > +19%
+# 1000,       100     > 0
+# 1000,       1000    > -20%
+# 1000,       10000   > -36%
+# 1000,       100000  > -49%
+# 10000,      10      > +48%
+# 10000,      100     > +25%
+# 10000,      1000    > 0
+# 10000,      10000   > -20%
+# 10000,      100000  > -37%
+# 100000,     10      > +86%
+# 100000,     100     > +57%
+# 100000,     1000    > +26%
+# 100000,     10000   > 0
+# 100000,     100000  > -20%
 #
 adaptive:
   excluded-sources:
     - PLAYER
   targets:
     - PLAYER
-  formula: $X * Math.max(1, Math.sqrt(($MOB_KILLS + 100) / ($DEATHS * 2 + 100)))
+  formula: $X * Math.pow((100.0 + $MOB_KILLS) / (100.0 + 10.0 * $DEATHS), 0.1)
   user-info: "Adaptive damage: %.3f"
 
 #
 # $DEATHS > Damage bonus
 #
-# 10      > +2.2%
+# 10      > +2.6%
 # 100     > +20%
-# 1000    > +133%
-# 10000   > +571%
+# 1000    > +85%
+# 10000   > +323%
+# 100000  > +573%
 #
 long-term-fine:
   excluded-sources:
     - PLAYER
   targets:
     - PLAYER
-  formula: $X * Math.sqrt((227 + $DEATHS) / 227)
+  formula: $X * Math.sqrt(Math.sqrt((93.1 + $DEATHS) / 93.1))
   user-info: "Long term fine:  %.3f"
 
 #
 # $MOB_KILLS > Damage bonus
 #
-# 10         > 0.6%
-# 100        > 6%
-# 1000       > 50%
-# 10000      > 267%
+# 10         > +0.3%
+# 100        > +2.6%
+# 1000       > +20%
+# 10000      > +85%
+# 100000     > +323%
 #
 long-term-bonus:
   sources:
     - PLAYER
-  formula: $X * Math.sqrt((800 + $MOB_KILLS) / 800)
+  formula: $X * Math.sqrt(Math.sqrt((931.0 + $MOB_KILLS) / 931.0))
   use-source-statistics: true
   user-info: "Long term bonus: %.3f"

@@ -1,6 +1,7 @@
 package com.gmail.uprial.customdamage;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
+import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -74,12 +75,19 @@ public final class CustomDamage extends JavaPlugin {
     }
 
     private static DamageConfig loadConfig(FileConfiguration config, CustomLogger mainLogger, CustomLogger secondLogger) {
-        boolean isDebugMode = DamageConfig.isDebugMode(config, mainLogger);
-        mainLogger.setDebugMode(isDebugMode);
-        if(secondLogger != null) {
-            secondLogger.setDebugMode(isDebugMode);
+        DamageConfig damageConfig = null;
+        try {
+            boolean isDebugMode = DamageConfig.isDebugMode(config, mainLogger);
+            mainLogger.setDebugMode(isDebugMode);
+            if(secondLogger != null) {
+                secondLogger.setDebugMode(isDebugMode);
+            }
+
+            damageConfig = DamageConfig.getFromConfig(config, mainLogger);
+        } catch (InvalidConfigException e) {
+            mainLogger.error(e.getMessage());
         }
 
-        return DamageConfig.getFromConfig(config, mainLogger);
+        return damageConfig;
     }
 }

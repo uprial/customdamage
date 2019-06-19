@@ -1,6 +1,7 @@
 package com.gmail.uprial.customdamage;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
+import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -24,21 +25,19 @@ public final class ConfigReader {
     }
 
     @SuppressWarnings({"BooleanParameter", "SameParameterValue", "BooleanMethodNameMustStartWithQuestion"})
-    public static boolean getBoolean(FileConfiguration config, CustomLogger customLogger, String key, String title, String name, boolean defaultValue) {
-        boolean value = defaultValue;
+    public static boolean getBoolean(FileConfiguration config, CustomLogger customLogger, String key, String title, String name, boolean defaultValue) throws InvalidConfigException {
         String strValue = config.getString(key);
 
         if(strValue == null) {
             customLogger.debug(String.format("Empty %s '%s'. Use default value %b", title, name, defaultValue));
+            return defaultValue;
         } else if(strValue.equalsIgnoreCase("true")) {
-            value = true;
+            return true;
         } else if(strValue.equalsIgnoreCase("false")) {
-            value = false;
+            return false;
         } else {
-            customLogger.error(String.format("Invalid %s '%s'. Use default value %b", title, name, defaultValue));
+            throw new InvalidConfigException(String.format("Invalid %s '%s'", title, name));
         }
-
-        return value;
     }
 
     @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "SameParameterValue"})

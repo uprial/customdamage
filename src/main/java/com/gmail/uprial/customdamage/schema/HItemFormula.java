@@ -1,6 +1,7 @@
 package com.gmail.uprial.customdamage.schema;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
+import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.Statistic;
 import org.bukkit.Statistic.Type;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -106,17 +107,15 @@ final class HItemFormula {
     }
 
 
-    static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) {
+    static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) throws InvalidConfigException {
         String expression = config.getString(key);
 
         if(expression == null) {
-            customLogger.error(String.format("Null/Empty formula of handler '%s'", handlerName));
-            return null;
+            throw new InvalidConfigException(String.format("Null/Empty formula of handler '%s'", handlerName));
         }
 
         HashMap<String,Statistic> statistics = new HashMap<>();
 
-        boolean error = false;
         boolean xFound = false;
 
         Matcher matcher = Pattern.compile("\\" + BASE_VAR_PREDICATE + "(\\w+)").matcher(expression);
@@ -130,17 +129,13 @@ final class HItemFormula {
                 try {
                     statistic = Statistic.valueOf(varName);
                 } catch (IllegalArgumentException ignored) {
-                    customLogger.error(String.format("Invalid statistic '%s' in formula of handler '%s'", varName, handlerName));
-                    error = true;
-                    continue;
+                    throw new InvalidConfigException(String.format("Invalid statistic '%s' in formula of handler '%s'", varName, handlerName));
                 }
                 if (statistic.getType() != Type.UNTYPED) {
                     String errorMessage = getForbiddenStatisticsErrorMessage(statistic.getType());
                     List<Statistic> allowedStatistics = getAllowedStatistics();
-                    customLogger.error(String.format("Forbidden statistic '%s' in formula of handler '%s': %s. Allowed statistics: %s",
+                    throw new InvalidConfigException(String.format("Forbidden statistic '%s' in formula of handler '%s': %s. Allowed statistics: %s",
                                                         varName, handlerName, errorMessage, allowedStatistics.toString()));
-                    error = true;
-                    continue;
                 }
 
                 statistics.put(varName, statistic);
@@ -150,16 +145,11 @@ final class HItemFormula {
             customLogger.warning(String.format("Formula of handler '%s' does no contain %s%s variable",
                     handlerName, BASE_VAR_PREDICATE, BASE_VAR_NAME));
         }
-        if (error) {
-            return null;
-        }
-
         HItemFormula formula = new HItemFormula(customLogger, handlerName, expression, statistics);
         try {
             formula.test();
         } catch (ScriptException ex) {
-            customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", handlerName, ex.getMessage()));
-            return null;
+            throw new InvalidConfigException(String.format("Formula of handler '%s' can not be evaluated: %s", handlerName, ex.getMessage()));
         }
 
         return formula;

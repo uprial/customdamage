@@ -1,6 +1,7 @@
 package com.gmail.uprial.customdamage;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
+import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import com.gmail.uprial.customdamage.schema.HItem;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
@@ -49,57 +50,51 @@ public final class DamageConfig {
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static boolean isDebugMode(FileConfiguration config, CustomLogger customLogger) {
+    public static boolean isDebugMode(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
         return ConfigReader.getBoolean(config, customLogger, "debug", "value flag", "debug", false);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static DamageConfig getFromConfig(FileConfiguration config, CustomLogger customLogger) {
+    public static DamageConfig getFromConfig(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
 
         List<HItem> handlers = new ArrayList<>();
         Map<String,Integer> keys = new HashMap<>();
 
         List<?> handlersConfig = config.getList("handlers");
         if((handlersConfig == null) || (handlersConfig.size() <= 0)) {
-            customLogger.error("Empty 'handlers' list");
-            return null;
+            throw new InvalidConfigException("Empty 'handlers' list");
         }
 
         int handlersConfigSize = handlersConfig.size();
         for(int i = 0; i < handlersConfigSize; i++) {
             Object item = handlersConfig.get(i);
             if(item == null) {
-                customLogger.error(String.format("Null key in 'handlers' at pos %d", i));
-                continue;
+                throw new InvalidConfigException(String.format("Null key in 'handlers' at pos %d", i));
             }
             String key = item.toString();
             if(key.length() < 1) {
-                customLogger.error(String.format("Empty key in 'handlers' at pos %d", i));
-                continue;
+                throw new InvalidConfigException(String.format("Empty key in 'handlers' at pos %d", i));
             }
             String keyLC = key.toLowerCase(Locale.getDefault());
             if(keys.containsKey(keyLC)) {
-                customLogger.error(String.format("key '%s' in 'handlers' is not unique", key));
-                continue;
+                throw new InvalidConfigException(String.format("key '%s' in 'handlers' is not unique", key));
             }
 
             if(config.getConfigurationSection(key) == null) {
-                customLogger.error(String.format("Null definition of handler '%s' at pos %d", key, i));
-                continue;
+                throw new InvalidConfigException(String.format("Null definition of handler '%s' at pos %d", key, i));
             }
 
-            HItem handler = HItem.getFromConfig(config, customLogger, key);
-            if(handler == null) {
-                continue;
+            try {
+                HItem handler = HItem.getFromConfig(config, customLogger, key);
+                handlers.add(handler);
+                keys.put(keyLC, 1);
+            } catch (InvalidConfigException e) {
+                customLogger.error(e.getMessage());
             }
-
-            handlers.add(handler);
-            keys.put(keyLC, 1);
         }
 
         if(handlers.size() < 1) {
-            customLogger.error("There are no valid handlers definitions");
-            return null;
+            throw new InvalidConfigException("There are no valid handlers definitions");
         }
 
         return new DamageConfig(handlers);

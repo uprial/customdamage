@@ -18,7 +18,6 @@ public final class CustomDamage extends JavaPlugin {
 
     private DamageConfig damageConfig = null;
     private CustomLogger consoleLogger = null;
-    private DamageListener damageListener = null;
 
     @Override
     public void onEnable() {
@@ -26,16 +25,15 @@ public final class CustomDamage extends JavaPlugin {
 
         consoleLogger = new CustomLogger(getLogger());
         damageConfig = loadConfig(getConfig(), consoleLogger);
-        damageListener = new DamageListener(this, consoleLogger);
 
-        getServer().getPluginManager().registerEvents(damageListener, this);
+        getServer().getPluginManager().registerEvents(new DamageListener(this, consoleLogger), this);
         getCommand(COMMAND_NS).setExecutor(new CustomDamageCommandExecutor(this));
         consoleLogger.info("Plugin enabled");
     }
 
     @Override
     public void onDisable() {
-        HandlerList.unregisterAll(damageListener);
+        HandlerList.unregisterAll(this);
         consoleLogger.info("Plugin disabled");
     }
 

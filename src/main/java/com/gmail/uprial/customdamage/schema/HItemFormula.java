@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class HItemFormula {
+final class HItemFormula {
+    private static final String BASE_VAR_PREDICATE = "$";
+    private static final String BASE_VAR_NAME = "X";
 
     private final CustomLogger customLogger;
     private final String handlerName;
@@ -37,11 +39,11 @@ public final class HItemFormula {
         this.statistics = !statistics.isEmpty() ? statistics : null;
     }
 
-    public double calculateDamage(double baseDamage, Entity statisticsSource) {
+    double calculateDamage(double baseDamage, Entity statisticsSource) {
         ScriptEngine jsEngine = getEngine();
 
         Player player;
-        jsEngine.put("$X", baseDamage);
+        jsEngine.put(BASE_VAR_PREDICATE + BASE_VAR_NAME, baseDamage);
 
         if (statistics != null) {
             if  (!(statisticsSource instanceof Player)) {
@@ -51,7 +53,7 @@ public final class HItemFormula {
             }
             player = (Player)statisticsSource;
             for (HashMap.Entry<String, Statistic> entry : statistics.entrySet()) {
-                jsEngine.put('$' + entry.getKey(), player.getStatistic(entry.getValue()));
+                jsEngine.put(BASE_VAR_PREDICATE + entry.getKey(), player.getStatistic(entry.getValue()));
             }
         } else {
             player = null;
@@ -81,18 +83,18 @@ public final class HItemFormula {
         }
     }
 
-    public boolean hasStatistics() {
+    boolean hasStatistics() {
         return (statistics != null);
     }
 
     private void test() throws ScriptException {
         ScriptEngine jsEngine = getEngine();
 
-        jsEngine.put("$X", 0);
+        jsEngine.put(BASE_VAR_PREDICATE + BASE_VAR_NAME, 0);
         if (statistics != null) {
             Set<String> keys = statistics.keySet();
-            for (String varname : keys) {
-                jsEngine.put('$' + varname, 0);
+            for (String varName : keys) {
+                jsEngine.put(BASE_VAR_PREDICATE + varName, 0);
             }
         }
         jsEngine.eval(expression);
@@ -104,7 +106,7 @@ public final class HItemFormula {
     }
 
 
-    public static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) {
+    static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) {
         String expression = config.getString(key);
 
         if(expression == null) {
@@ -114,21 +116,21 @@ public final class HItemFormula {
 
         HashMap<String,Statistic> statistics = new HashMap<>();
 
-        Boolean error = false;
-        Boolean xFound = false;
+        boolean error = false;
+        boolean xFound = false;
 
-        Matcher matcher = Pattern.compile("\\$(\\w+)").matcher(expression);
+        Matcher matcher = Pattern.compile("\\" + BASE_VAR_PREDICATE + "(\\w+)").matcher(expression);
         //noinspection MethodCallInLoopCondition
         while (matcher.find()) {
-            String varname = matcher.group(1);
-            if (varname.equals("X")) {
+            String varName = matcher.group(1);
+            if (varName.equals(BASE_VAR_NAME)) {
                 xFound = true;
             } else {
                 Statistic statistic;
                 try {
-                    statistic = Statistic.valueOf(varname);
+                    statistic = Statistic.valueOf(varName);
                 } catch (IllegalArgumentException ignored) {
-                    customLogger.error(String.format("Invalid statistic '%s' in formula of handler '%s'", varname, handlerName));
+                    customLogger.error(String.format("Invalid statistic '%s' in formula of handler '%s'", varName, handlerName));
                     error = true;
                     continue;
                 }
@@ -136,16 +138,17 @@ public final class HItemFormula {
                     String errorMessage = getForbiddenStatisticsErrorMessage(statistic.getType());
                     List<Statistic> allowedStatistics = getAllowedStatistics();
                     customLogger.error(String.format("Forbidden statistic '%s' in formula of handler '%s': %s. Allowed statistics: %s",
-                                                        varname, handlerName, errorMessage, allowedStatistics.toString()));
+                                                        varName, handlerName, errorMessage, allowedStatistics.toString()));
                     error = true;
                     continue;
                 }
 
-                statistics.put(varname, statistic);
+                statistics.put(varName, statistic);
             }
         }
         if (!xFound) {
-            customLogger.warning(String.format("Formula of handler '%s' does no contain $X variable", handlerName));
+            customLogger.warning(String.format("Formula of handler '%s' does no contain %s%s variable",
+                    handlerName, BASE_VAR_PREDICATE, BASE_VAR_NAME));
         }
         if (error) {
             return null;

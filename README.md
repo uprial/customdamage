@@ -4,7 +4,7 @@ Tested on Spigot-1.14.2.
 
 ## Introduction
 
-This is fully customizable Minecraft (Bukkit) plugin that allows you to control a damage taken by entities.
+This is a fully customizable Minecraft (Bukkit) plugin that allows you to control damage taken by entities.
 
 ## Features
 
@@ -14,15 +14,13 @@ This is fully customizable Minecraft (Bukkit) plugin that allows you to control 
 * There is also a short-term increase of incoming damage based on a rate of monster kills to death to cut the player domination.
 
 #### You can configure:
-* Filter of damage sources, targets and causes
+* A filter of damage sources, targets and causes
 * A formula of how to calculate a damage
 * Dependencies from a player statistics
 
 #### You can solve the following problems:
-* Increase a damage taken by a specific entity, thus make some enemies more
-dangerous naturally
-* Change a damage depending on a players' kills or deaths, thus make a game more
-difficult for experienced players and easy for newbies without mechanics changes
+* Increase the damage taken by a specific entity, thus make some enemies more dangerous naturally
+* Change damage depending on a players' kills or deaths, thus making a game more difficult for experienced players and easy for newbies without mechanics changes
 
 ## Commands
 

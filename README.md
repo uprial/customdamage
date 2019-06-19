@@ -35,7 +35,7 @@ difficult for experienced players and easy for newbies without mechanics changes
 * Access to 'reload' command:
 `customdamage.reload` (default: op)
 
-* Access to 'info <player\>' command:
+* Access to 'info @player' command:
 `customdamage.info` (default: op)
 
 ## Configuration

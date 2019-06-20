@@ -8,6 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ConfigReader {
+    @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "SameParameterValue"})
+    public static String getString(FileConfiguration config, CustomLogger customLogger, String key, String title) {
+        String string = config.getString(key);
+
+        if(string == null) {
+            customLogger.debug(String.format("Null/Empty %s", title));
+            return null;
+        }
+
+        return string;
+    }
+
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     public static List<String> getStringList(FileConfiguration config, CustomLogger customLogger, String key, String title) {
         List<?> lines = config.getList(key);
@@ -38,17 +50,5 @@ public final class ConfigReader {
         } else {
             throw new InvalidConfigException(String.format("Invalid %s", title));
         }
-    }
-
-    @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "SameParameterValue"})
-    public static String getString(FileConfiguration config, CustomLogger customLogger, String key, String title) {
-        String string = config.getString(key);
-
-        if(string == null) {
-            customLogger.debug(String.format("Null/Empty %s", title));
-            return null;
-        }
-
-        return string;
     }
 }

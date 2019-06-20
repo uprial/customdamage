@@ -1,6 +1,6 @@
 package com.gmail.uprial.customdamage.schema;
 
-import com.gmail.uprial.customdamage.ConfigReader;
+import com.gmail.uprial.customdamage.config.ConfigReader;
 import com.gmail.uprial.customdamage.common.CustomLogger;
 import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -84,18 +84,18 @@ public final class HItem {
 
     public static HItem getFromConfig(FileConfiguration config, CustomLogger customLogger, String key) throws InvalidConfigException {
 
-        Set<EntityType> sources = getEntityTypesFromConfig(config, customLogger, key + ".sources", "sources list of handler", key);
-        Set<EntityType> excludedSources = getEntityTypesFromConfig(config, customLogger, key + ".excluded-sources", "excluded sources list of handler", key);
-        Set<EntityType> targets = getEntityTypesFromConfig(config, customLogger, key + ".targets", "targets list of handler", key);
-        Set<EntityType> excludedTargets = getEntityTypesFromConfig(config, customLogger, key + ".excluded-targets", "excluded targets list of handler", key);
-        Set<DamageCause> causes = getDamageCausesFromConfig(config, customLogger, key + ".causes", "damage causes list of handler", key);
-        Set<DamageCause> excludedCauses = getDamageCausesFromConfig(config, customLogger, key + ".excluded-causes", "excluded damage causes list of handler", key);
+        Set<EntityType> sources = getEntityTypesFromConfig(config, customLogger, key + ".sources", String.format("sources list of handler '%s'", key));
+        Set<EntityType> excludedSources = getEntityTypesFromConfig(config, customLogger, key + ".excluded-sources", String.format("excluded sources list of handler '%s'", key));
+        Set<EntityType> targets = getEntityTypesFromConfig(config, customLogger, key + ".targets", String.format("targets list of handler '%s'", key));
+        Set<EntityType> excludedTargets = getEntityTypesFromConfig(config, customLogger, key + ".excluded-targets", String.format("excluded targets list of handler '%s'", key));
+        Set<DamageCause> causes = getDamageCausesFromConfig(config, customLogger, key + ".causes", String.format("damage causes list of handler '%s'", key));
+        Set<DamageCause> excludedCauses = getDamageCausesFromConfig(config, customLogger, key + ".excluded-causes", String.format("excluded damage causes list of handler '%s'", key));
 
         testIntersection(customLogger, key, "Sources list and excluded sources list", sources, excludedSources);
         testIntersection(customLogger, key, "Targets list and excluded targets list", targets, excludedTargets);
         testIntersection(customLogger, key, "Causes list and excluded causes list", causes, excludedCauses);
 
-        boolean useSourceStatistics = ConfigReader.getBoolean(config, customLogger, key + ".use-source-statistics", "use-source-statistics flag of handler", key, false);
+        boolean useSourceStatistics = ConfigReader.getBoolean(config, customLogger, key + ".use-source-statistics", String.format("use-source-statistics flag of handler '%s'", key), false);
 
         HItemFormula formula = HItemFormula.getFromConfig(config, customLogger, key + ".formula", key);
 
@@ -120,7 +120,7 @@ public final class HItem {
             }
         }
 
-        String userInfo = ConfigReader.getString(config, customLogger, key + ".user-info", "user-info string of handler", key);
+        String userInfo = ConfigReader.getString(config, customLogger, key + ".user-info", String.format("user-info string of handler '%s'", key));
 
         return new HItem(sources, excludedSources, targets, excludedTargets, causes, excludedCauses, userInfo, useSourceStatistics, formula);
     }
@@ -134,8 +134,8 @@ public final class HItem {
         }
     }
 
-    private static Set<EntityType> getEntityTypesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title, String name) throws InvalidConfigException {
-        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title, name);
+    private static Set<EntityType> getEntityTypesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title) throws InvalidConfigException {
+        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title);
         if (strings == null) {
             return null;
         }
@@ -149,22 +149,22 @@ public final class HItem {
             try {
                 entityType = EntityType.valueOf(string);
             } catch (IllegalArgumentException ignored) {
-                throw new InvalidConfigException(String.format("Invalid entity type '%s' in %s '%s' at pos %d", string, title, name, i));
+                throw new InvalidConfigException(String.format("Invalid entity type '%s' in %s at pos %d", string, title, i));
             }
             if (entityTypes.contains(entityType)) {
-                throw new InvalidConfigException(String.format("Entity type '%s' in %s '%s' is not unique", entityType.toString(), title, name));
+                throw new InvalidConfigException(String.format("Entity type '%s' in %s is not unique", entityType.toString(), title));
             }
             if (entityTypeList.contains(entityType)) {
-                throw new InvalidConfigException(String.format("Entity type '%s' in %s '%s' should not be a projectile. Projectile entity types: %s",
-                                    entityType.toString(), title, name, entityTypeList.toString()));
+                throw new InvalidConfigException(String.format("Entity type '%s' in %s should not be a projectile. Projectile entity types: %s",
+                                    entityType.toString(), title, entityTypeList.toString()));
             }
             entityTypes.add(entityType);
         }
         return entityTypes;
     }
 
-    private static Set<DamageCause> getDamageCausesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title, String name) throws InvalidConfigException {
-        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title, name);
+    private static Set<DamageCause> getDamageCausesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title) throws InvalidConfigException {
+        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title);
         if (strings == null) {
             return null;
         }
@@ -177,10 +177,10 @@ public final class HItem {
             try {
                 damageCause = DamageCause.valueOf(string);
             } catch (IllegalArgumentException ignored) {
-                throw new InvalidConfigException(String.format("Invalid damage cause '%s' in %s '%s' at pos %d", string, title, name, i));
+                throw new InvalidConfigException(String.format("Invalid damage cause '%s' in %s at pos %d", string, title, i));
             }
             if (damageCauses.contains(damageCause)) {
-                throw new InvalidConfigException(String.format("Damage cause '%s' in %s '%s' is not unique", damageCause.toString(), title, name));
+                throw new InvalidConfigException(String.format("Damage cause '%s' in %s is not unique", damageCause.toString(), title));
             }
             damageCauses.add(damageCause);
         }

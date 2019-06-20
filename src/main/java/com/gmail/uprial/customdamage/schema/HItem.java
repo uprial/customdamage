@@ -120,7 +120,7 @@ public final class HItem {
             }
         }
 
-        String userInfo = ConfigReader.getString(config, customLogger, key + ".user-info", String.format("user-info string of handler '%s'", key));
+        String userInfo = ConfigReader.getStringUnsafe(config, customLogger, key + ".user-info", String.format("user-info string of handler '%s'", key));
 
         return new HItem(sources, excludedSources, targets, excludedTargets, causes, excludedCauses, userInfo, useSourceStatistics, formula);
     }

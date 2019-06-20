@@ -11,6 +11,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.*;
 
+import static com.gmail.uprial.customdamage.config.ConfigReader.getKey;
+
 public final class DamageConfig {
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -59,7 +61,7 @@ public final class DamageConfig {
     public static DamageConfig getFromConfig(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
 
         List<HItem> handlers = new ArrayList<>();
-        Map<String,Integer> keys = new HashMap<>();
+        Set<String> keys = new HashSet<>();
 
         List<?> handlersConfig = config.getList("handlers");
         if((handlersConfig == null) || (handlersConfig.size() <= 0)) {
@@ -68,27 +70,18 @@ public final class DamageConfig {
 
         int handlersConfigSize = handlersConfig.size();
         for(int i = 0; i < handlersConfigSize; i++) {
-            Object item = handlersConfig.get(i);
-            if(item == null) {
-                throw new InvalidConfigException(String.format("Null key in 'handlers' at pos %d", i));
-            }
-            String key = item.toString();
-            if(key.length() < 1) {
-                throw new InvalidConfigException(String.format("Empty key in 'handlers' at pos %d", i));
-            }
+            String key = getKey(handlersConfig.get(i), "'handlers'", i);
             String keyLC = key.toLowerCase(Locale.getDefault());
-            if(keys.containsKey(keyLC)) {
+            if(keys.contains(keyLC)) {
                 throw new InvalidConfigException(String.format("key '%s' in 'handlers' is not unique", key));
             }
-
-            if(config.getConfigurationSection(key) == null) {
+            if(config.get(key) == null) {
                 throw new InvalidConfigException(String.format("Null definition of handler '%s' at pos %d", key, i));
             }
+            keys.add(keyLC);
 
             try {
-                HItem handler = HItem.getFromConfig(config, customLogger, key);
-                handlers.add(handler);
-                keys.put(keyLC, 1);
+                handlers.add(HItem.getFromConfig(config, customLogger, key));
             } catch (InvalidConfigException e) {
                 customLogger.error(e.getMessage());
             }

@@ -8,8 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ConfigReader {
+    public static String getKey(Object item, String title, int i) throws InvalidConfigException {
+        if (item == null) {
+            throw new InvalidConfigException(String.format("Null key in %s at pos %d", title, i));
+        }
+        if (!(item instanceof String)) {
+            throw new InvalidConfigException(String.format("Key '%s' in %s at pos %d is not a string", item.toString(), title, i));
+        }
+        String key = item.toString();
+        if (key.length() < 1) {
+            throw new InvalidConfigException(String.format("Empty key in %s at pos %d", title, i));
+        }
+        return key;
+    }
+
     @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "SameParameterValue"})
-    public static String getString(FileConfiguration config, CustomLogger customLogger, String key, String title) {
+    public static String getStringUnsafe(FileConfiguration config, CustomLogger customLogger, String key, String title) {
         String string = config.getString(key);
 
         if(string == null) {
@@ -24,12 +38,12 @@ public final class ConfigReader {
     public static List<String> getStringList(FileConfiguration config, CustomLogger customLogger, String key, String title) {
         List<?> lines = config.getList(key);
         if(lines != null) {
-            List<String> description = new ArrayList<>();
-            for(Object line : lines) {
-                description.add(line.toString());
+            List<String> strings = new ArrayList<>();
+            for (Object line : lines) {
+                strings.add(line.toString());
             }
 
-            return description;
+            return strings;
         } else {
             customLogger.debug(String.format("Empty %s. Use default value NULL", title));
             return null;

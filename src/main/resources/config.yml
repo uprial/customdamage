@@ -167,23 +167,6 @@ adaptive:
   user-info: "Adaptive damage: %.3f"
 
 #
-# $DEATHS > Damage bonus
-#
-# 10      > +2.6%
-# 100     > +20%
-# 1000    > +85%
-# 10000   > +323%
-# 100000  > +573%
-#
-long-term-fine:
-  excluded-sources:
-    - PLAYER
-  targets:
-    - PLAYER
-  formula: $X * Math.sqrt(Math.sqrt((93.1 + $DEATHS) / 93.1))
-  user-info: "Long term fine:  %.3f"
-
-#
 # $MOB_KILLS > Damage bonus
 #
 # 10         > +0.3%

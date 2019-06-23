@@ -1,6 +1,6 @@
 package com.gmail.uprial.customdamage.schema;
 
-import com.gmail.uprial.customdamage.config.ConfigReader;
+import com.gmail.uprial.customdamage.config.ConfigReaderSimple;
 import com.gmail.uprial.customdamage.common.CustomLogger;
 import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -95,7 +95,7 @@ public final class HItem {
         testIntersection(customLogger, key, "Targets list and excluded targets list", targets, excludedTargets);
         testIntersection(customLogger, key, "Causes list and excluded causes list", causes, excludedCauses);
 
-        boolean useSourceStatistics = ConfigReader.getBoolean(config, customLogger, key + ".use-source-statistics", String.format("use-source-statistics flag of handler '%s'", key), false);
+        boolean useSourceStatistics = ConfigReaderSimple.getBoolean(config, customLogger, key + ".use-source-statistics", String.format("use-source-statistics flag of handler '%s'", key), false);
 
         HItemFormula formula = HItemFormula.getFromConfig(config, customLogger, key + ".formula", key);
 
@@ -120,7 +120,13 @@ public final class HItem {
             }
         }
 
-        String userInfo = ConfigReader.getStringUnsafe(config, customLogger, key + ".user-info", String.format("user-info string of handler '%s'", key));
+        String userInfo;
+        try {
+            userInfo = ConfigReaderSimple.getString(config, key + ".user-info", String.format("user-info string of handler '%s'", key));
+        } catch (InvalidConfigException e) {
+            userInfo = null;
+            customLogger.debug(e.getMessage());
+        }
 
         return new HItem(sources, excludedSources, targets, excludedTargets, causes, excludedCauses, userInfo, useSourceStatistics, formula);
     }
@@ -135,7 +141,7 @@ public final class HItem {
     }
 
     private static Set<EntityType> getEntityTypesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title) throws InvalidConfigException {
-        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title);
+        List<String> strings = ConfigReaderSimple.getStringList(config, customLogger, key, title);
         if (strings == null) {
             return null;
         }
@@ -164,7 +170,7 @@ public final class HItem {
     }
 
     private static Set<DamageCause> getDamageCausesFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String title) throws InvalidConfigException {
-        List<String> strings = ConfigReader.getStringList(config, customLogger, key, title);
+        List<String> strings = ConfigReaderSimple.getStringList(config, customLogger, key, title);
         if (strings == null) {
             return null;
         }

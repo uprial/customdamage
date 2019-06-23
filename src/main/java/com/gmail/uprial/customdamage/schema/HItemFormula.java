@@ -1,6 +1,7 @@
 package com.gmail.uprial.customdamage.schema;
 
 import com.gmail.uprial.customdamage.common.CustomLogger;
+import com.gmail.uprial.customdamage.config.ConfigReaderSimple;
 import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import org.bukkit.Statistic;
 import org.bukkit.Statistic.Type;
@@ -73,7 +74,7 @@ final class HItemFormula {
             customLogger.debug(String.format("Apply %s%s", handlerName, params.toString()));
         }
 
-           try {
+        try {
             return Float.parseFloat(jsEngine.eval(expression).toString());
         } catch (NumberFormatException ex) {
             customLogger.error(String.format("Formula of handler '%s' can not be evaluated: %s", handlerName, ex.getMessage()));
@@ -108,11 +109,7 @@ final class HItemFormula {
 
 
     static HItemFormula getFromConfig(FileConfiguration config, CustomLogger customLogger, String key, String handlerName) throws InvalidConfigException {
-        String expression = config.getString(key);
-
-        if(expression == null) {
-            throw new InvalidConfigException(String.format("Null/Empty formula of handler '%s'", handlerName));
-        }
+        String expression = ConfigReaderSimple.getString(config, key, String.format("formula of handler '%s'", handlerName));
 
         HashMap<String,Statistic> statistics = new HashMap<>();
 

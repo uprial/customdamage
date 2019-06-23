@@ -1,6 +1,6 @@
 package com.gmail.uprial.customdamage;
 
-import com.gmail.uprial.customdamage.config.ConfigReader;
+import com.gmail.uprial.customdamage.config.ConfigReaderSimple;
 import com.gmail.uprial.customdamage.common.CustomLogger;
 import com.gmail.uprial.customdamage.config.InvalidConfigException;
 import com.gmail.uprial.customdamage.schema.HItem;
@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.*;
 
-import static com.gmail.uprial.customdamage.config.ConfigReader.getKey;
+import static com.gmail.uprial.customdamage.config.ConfigReaderSimple.getKey;
 
 public final class DamageConfig {
 
@@ -54,7 +54,7 @@ public final class DamageConfig {
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     public static boolean isDebugMode(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
-        return ConfigReader.getBoolean(config, customLogger, "debug", "'debug' flag", false);
+        return ConfigReaderSimple.getBoolean(config, customLogger, "debug", "'debug' flag", false);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")

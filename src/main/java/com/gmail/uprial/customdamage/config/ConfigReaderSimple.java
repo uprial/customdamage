@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ConfigReader {
+public final class ConfigReaderSimple {
     public static String getKey(Object item, String title, int i) throws InvalidConfigException {
         if (item == null) {
             throw new InvalidConfigException(String.format("Null key in %s at pos %d", title, i));
@@ -22,17 +22,14 @@ public final class ConfigReader {
         return key;
     }
 
-    @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "SameParameterValue"})
-    public static String getStringUnsafe(FileConfiguration config, CustomLogger customLogger, String key, String title) {
+    public static String getString(FileConfiguration config, String key, String title) throws InvalidConfigException {
         String string = config.getString(key);
 
         if(string == null) {
-            customLogger.debug(String.format("Null %s", title));
-            return null;
+            throw new InvalidConfigException(String.format("Null %s", title));
         }
         if(string.length() < 1) {
-            customLogger.debug(String.format("Empty %s", title));
-            return null;
+            throw new InvalidConfigException(String.format("Empty %s", title));
         }
 
         return string;

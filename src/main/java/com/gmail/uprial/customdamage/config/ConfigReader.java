@@ -27,7 +27,11 @@ public final class ConfigReader {
         String string = config.getString(key);
 
         if(string == null) {
-            customLogger.debug(String.format("Null/Empty %s", title));
+            customLogger.debug(String.format("Null %s", title));
+            return null;
+        }
+        if(string.length() < 1) {
+            customLogger.debug(String.format("Empty %s", title));
             return null;
         }
 

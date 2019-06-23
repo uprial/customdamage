@@ -13,7 +13,7 @@ import java.util.*;
 
 import static com.gmail.uprial.customdamage.config.ConfigReaderSimple.getKey;
 
-public final class DamageConfig {
+final class DamageConfig {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final String EMPTY_INFO = "[INFORMATION IS NOT AVAILABLE]";
@@ -23,21 +23,21 @@ public final class DamageConfig {
         this.handlers = handlers;
     }
 
-    public double calculateDamageByEntity(double baseDamage, Entity source, Entity target, DamageCause cause) {
+    double calculateDamageByEntity(double baseDamage, Entity source, Entity target, DamageCause cause) {
         for (HItem handler : handlers) {
             baseDamage = handler.calculateDamageByEntity(baseDamage, source, target, cause);
         }
         return baseDamage;
     }
 
-    public double calculateDamage(double baseDamage, Entity target, DamageCause cause) {
+    double calculateDamage(double baseDamage, Entity target, DamageCause cause) {
         for (HItem handler : handlers) {
             baseDamage = handler.calculateDamage(baseDamage, target, cause);
         }
         return baseDamage;
     }
 
-    public String getPlayerInfo(Player player) {
+    String getPlayerInfo(Player player) {
         StringBuilder info = new StringBuilder();
         for (HItem handler : handlers) {
             if (handler.isUserVisible()) {
@@ -53,12 +53,12 @@ public final class DamageConfig {
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static boolean isDebugMode(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
+    static boolean isDebugMode(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
         return ConfigReaderSimple.getBoolean(config, customLogger, "debug", "'debug' flag", false);
     }
 
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static DamageConfig getFromConfig(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
+    static DamageConfig getFromConfig(FileConfiguration config, CustomLogger customLogger) throws InvalidConfigException {
 
         List<HItem> handlers = new ArrayList<>();
         Set<String> keys = new HashSet<>();

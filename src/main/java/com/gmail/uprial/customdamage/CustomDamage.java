@@ -50,16 +50,16 @@ public final class CustomDamage extends JavaPlugin {
         return YamlConfiguration.loadConfiguration(configFile);
     }
 
-    public DamageConfig getDamageConfig() {
+    DamageConfig getDamageConfig() {
         return damageConfig;
     }
 
-    public void reloadDamageConfig(CustomLogger userLogger) {
+    void reloadDamageConfig(CustomLogger userLogger) {
         reloadConfig();
         damageConfig = loadConfig(getConfig(), userLogger, consoleLogger);
     }
 
-    public Player getPlayerByName(String playerName) {
+    Player getPlayerByName(String playerName) {
         Collection<? extends Player> onlinePlayers = getServer().getOnlinePlayers();
         for (Player player : onlinePlayers) {
             if (player.getName().equalsIgnoreCase(playerName)) {

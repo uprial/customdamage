@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import com.gmail.uprial.customdamage.common.CustomLogger;
 
 class CustomDamageCommandExecutor implements CommandExecutor {
-    public static final String COMMAND_NS = "customdamage";
+    static final String COMMAND_NS = "customdamage";
 
     private final CustomDamage plugin;
 

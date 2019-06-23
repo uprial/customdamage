@@ -1,3 +1,5 @@
+![CustomDamage Logo](images/customdamage-logo.jpg)
+
 ## Compatibility
 
 Tested on Spigot-1.14.2.

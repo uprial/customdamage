@@ -28,7 +28,7 @@ This is a fully customizable Minecraft (Bukkit) plugin that allows you to contro
 
 * `customdamage reload`        - reload config from disk
 * `customdamage info`          - show damage modifiers
-* `customdamage info @player`  - show damage modifiers of @player;
+* `customdamage info @player`  - show damage modifiers of @player
 
 ## Permissions
 

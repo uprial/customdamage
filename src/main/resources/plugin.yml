@@ -1,6 +1,6 @@
 name: CustomDamage
 main: com.gmail.uprial.customdamage.CustomDamage
-version: 0.1.8
+version: 0.1.9
 commands:
    customdamage:
       description: Reload CustomDamage config

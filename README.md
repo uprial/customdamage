@@ -1,6 +1,6 @@
 ![CustomDamage Logo](images/customdamage-logo.jpg)
 
-## Warning: I frozen this plugin ue to lack of popularity.
+## Warning: I frozed this plugin ue to lack of popularity.
 
 ## Compatibility
 

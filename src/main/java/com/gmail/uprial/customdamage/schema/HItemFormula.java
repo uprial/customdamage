@@ -3,6 +3,7 @@ package com.gmail.uprial.customdamage.schema;
 import com.gmail.uprial.customdamage.common.CustomLogger;
 import com.gmail.uprial.customdamage.config.ConfigReaderSimple;
 import com.gmail.uprial.customdamage.config.InvalidConfigException;
+import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.Statistic.Type;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -103,8 +104,11 @@ final class HItemFormula {
     }
 
     private static ScriptEngine getEngine() {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        return mgr.getEngineByName("JavaScript");
+        return Bukkit.getServer()
+                .getServicesManager()
+                .getRegistration(ScriptEngineManager.class)
+                .getProvider().
+                getEngineByName("nashorn");
     }
 
 

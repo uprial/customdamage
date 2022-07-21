@@ -6,6 +6,10 @@
 
 Tested on Spigot-1.14, 1.15, 1.16.
 
+## Dependencies
+
+* [NashornJs](https://www.spigotmc.org/resources/nashornjs-provider-and-cli.91204/)
+
 ## Introduction
 
 This is a fully customizable Minecraft (Bukkit) plugin that allows you to control damage taken by entities.

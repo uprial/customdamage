@@ -91,7 +91,15 @@ final class HItemFormula {
     }
 
     private void test() throws ScriptException {
-        ScriptEngine jsEngine = getEngine();
+        final ScriptEngine jsEngine;
+
+        try {
+            jsEngine = getEngine();
+        } catch (NullPointerException e) {
+            customLogger.error("Make sure you added NashornJs to your plugins:" +
+                    " https://www.spigotmc.org/resources/nashornjs-provider-and-cli.91204/");
+            throw e;
+        }
 
         jsEngine.put(BASE_VAR_PREDICATE + BASE_VAR_NAME, 0);
         if (statistics != null) {

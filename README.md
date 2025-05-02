@@ -4,7 +4,7 @@
 
 ## Compatibility
 
-Tested on Spigot-1.19.
+Tested on Spigot-1.19, 1.21.5.
 
 ## Dependencies
 
